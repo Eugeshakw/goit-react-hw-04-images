@@ -27,17 +27,15 @@ const [largeImageUrl, setlargeImageUrl] = useState('');
 
 
   const toggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
+   setshowmodal(true);
   };
 
-  const handleFormSubmit = searchquery => {
-    // if (searchquery === searchquery) {
-    //   return toast.warn(`вы уже просматриваете ${searchquery}`);
-    // }
+  const handleFormSubmit = newSearchquery => {
+    if (newSearchquery === searchquery) {
+      return toast.warn(`вы уже просматриваете ${searchquery}`);
+    }
 
-    setsearchquery(searchquery.toLowerCase());
+    setsearchquery(newSearchquery.toLowerCase());
     setimages([]);
     setisloading(true);
     setpage(1);
@@ -47,75 +45,58 @@ const [largeImageUrl, setlargeImageUrl] = useState('');
   const fetchImages = useCallback(
 
     async pageNumber => {
-      const photos = await getPhotosByQuery(searchquery, page);
-
-      setimages(prevImage => [...prevImage, photos.hits])
+      
+      const photos = await getPhotosByQuery(searchquery, pageNumber);
+      
+      setimages(prevImage => [...prevImage, ...photos.hits])
+      setpage(1);
       setisloading(false);
       setpage(prevPage => prevPage + 1);
+
+     
     }, [searchquery]
+   
   )
-
-
-  // const fetchImages = async () => {
-  //   try {
-
-      
-      
-
-      
-  //     const photos = await getPhotosByQuery(searchquery, page);
-      
-  //     this.setState(prevState => ({
-  //       // images: [...prevState.images, ...photos.hits],
-  //       page: prevState.page + 1,
-  //       isloading: false,
-  //     }));
-      
-  //     if (photos.hits.length > 0 && this.state.page === 1) {
-  //       toast.success('you are our images');
-        
-        
-  //     } else if(photos.hits.length === 0){
-  //       throw new Error();
-  //     }
-  //   } catch (err) {
-      
-  //     toast.error('No IMAGES found');
-      
-  //   }
-  // };
-  
 
   useEffect(() => {
     setpage(1);
     setimages([]);
-    
     if(searchquery !== ''){
-      fetchImages
+      fetchImages()
     }
-    
-  }, [fetchImages])
+    console.log('сработал юз');
+  }, [searchquery, fetchImages]);
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevState.searchquery !== this.state.searchquery) {
-  //     this.fetchImages();
-      
-  //   }
-  // }
+
+  useEffect(() => {
+    console.log('второй юз');
+    if (page === 1) 
+    return;
+    fetchImages(page);
+  }, [page, fetchImages]);
+
+  
 
  const handleImageClick = largeImageUrl => {
-    this.setState({ largeImageUrl });
-    this.toggleModal();
+
+  setlargeImageUrl(largeImageUrl)
+    
+    toggleModal();
   };
 
   const onClose = () => {
-    this.setState({ showModal: false });
+    setshowmodal(false);
   };
 const handleLoadMore = () => {
-  setpage(prevPage => prevPage + 1)
+  const nextPage = page + 1;
+
+  setpage(nextPage)
+  console.log(nextPage);
+
 }
+
   
-    // const { showModal } = this.state;
+    
     return (
       <>
         <Searchbar onSubmit={handleFormSubmit} />
